@@ -6,13 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function LoginPage() {
   const handleForgotPassword = () => {
-    console.log({
-      domain: process.env.NEXT_PUBLIC_AZURE_AD_B2C_AUTHORITY_DOMAIN,
-      tenant: process.env.NEXT_PUBLIC_AZURE_AD_B2C_TENANT_NAME,
-      clientId: process.env.NEXT_PUBLIC_AZURE_AD_B2C_CLIENT_ID,
-      url: process.env.NEXT_PUBLIC_NEXTAUTH_URL
-    });
-
     const resetPasswordUrl = 
       `https://vcyberizb2c.b2clogin.com/vcyberizb2c.onmicrosoft.com/oauth2/v2.0/authorize` +
       `?p=B2C_1_password_reset` +
@@ -32,7 +25,7 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-center text-2xl">Sign in</CardTitle>
           <CardDescription className="text-center">
-            Sign in with your email address
+            Welcome back! Please sign in to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
