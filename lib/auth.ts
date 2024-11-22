@@ -9,30 +9,37 @@ export const authOptions: NextAuthOptions = {
       tenantId: process.env.AZURE_AD_B2C_TENANT_NAME!,
       primaryUserFlow: process.env.AZURE_AD_B2C_PRIMARY_USER_FLOW!,
       wellKnown: `https://${process.env.AZURE_AD_B2C_AUTHORITY_DOMAIN}/${process.env.AZURE_AD_B2C_TENANT_NAME}/${process.env.AZURE_AD_B2C_PRIMARY_USER_FLOW}/v2.0/.well-known/openid-configuration`,
-      authorization: { params: { scope: "offline_access openid" } },
+      authorization: { 
+        params: { 
+          scope: "offline_access openid profile",
+          prompt: "login"
+        } 
+      },
       profile(profile) {
         return {
           id: profile.sub,
-          name: profile.given_name,
-          email: profile.emails ? profile.emails[0] : null,
+          name: profile.displayName || profile.given_name,
+          email: profile.emails?.[0] || profile.email,
           given_name: profile.given_name,
+          displayName: profile.displayName || profile.given_name
         }
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
-        token.accessToken = account.access_token
-      }
-      return token
-    },
-    async session({ session, token }) {
-      session.accessToken = token.accessToken
-      return session
-    },
+  pages: {
+    signIn: '/test-login',
   },
-  session: {
-    strategy: "jwt" as const,
+  callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      // Allow B2C password reset flow
+      if (url.includes('B2C_1_password_reset')) {
+        return url;
+      }
+      return url.startsWith(baseUrl) ? url : baseUrl;
+    },
   },
 }
+

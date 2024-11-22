@@ -1,68 +1,60 @@
 'use client'
 
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
-import { signIn, useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
-import { LogIn } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function LoginPage() {
-  const { data: session, status } = useSession()
+  const handleForgotPassword = () => {
+    console.log({
+      domain: process.env.NEXT_PUBLIC_AZURE_AD_B2C_AUTHORITY_DOMAIN,
+      tenant: process.env.NEXT_PUBLIC_AZURE_AD_B2C_TENANT_NAME,
+      clientId: process.env.NEXT_PUBLIC_AZURE_AD_B2C_CLIENT_ID,
+      url: process.env.NEXT_PUBLIC_NEXTAUTH_URL
+    });
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    )
-  }
+    const resetPasswordUrl = 
+      `https://vcyberizb2c.b2clogin.com/vcyberizb2c.onmicrosoft.com/oauth2/v2.0/authorize` +
+      `?p=B2C_1_password_reset` +
+      `&client_id=aba7d3d7-eaaa-4ed6-b1d5-f81e29967565` +
+      `&nonce=${Math.random().toString(36)}` +
+      `&redirect_uri=${encodeURIComponent('http://localhost:3000/api/auth/callback/azure-ad-b2c')}` +
+      `&scope=openid` +
+      `&response_type=id_token` +
+      `&prompt=login`;
 
-  if (session) {
-    redirect("/")
+    window.location.href = resetPasswordUrl;
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-            Welcome Back
-          </h1>
-          <p className="text-lg text-gray-600">
-            Sign in to access the Customer Onboarding Portal
-          </p>
-        </div>
-
-        <div className="bg-white p-8 rounded-lg shadow-md">
-          <div className="space-y-6">
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <Button 
-                className="w-full max-w-sm flex items-center justify-center gap-2"
-                size="lg"
-                onClick={() => signIn("azure-ad-b2c", { callbackUrl: "/" })}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl">Sign in</CardTitle>
+          <CardDescription className="text-center">
+            Sign in with your email address
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Button 
+              className="w-full" 
+              onClick={() => signIn("azure-ad-b2c", { callbackUrl: "/" })}
+            >
+              Sign in with Azure AD B2C
+            </Button>
+            
+            <div className="text-center">
+              <button
+                onClick={handleForgotPassword}
+                className="text-sm text-blue-600 hover:text-blue-500"
               >
-                <LogIn className="w-5 h-5" />
-                Sign in with Azure AD
-              </Button>
-              
-              <p className="text-sm text-gray-500 mt-4">
-                By signing in, you agree to our Terms of Service and Privacy Policy
-              </p>
+                Forgot your password?
+              </button>
             </div>
           </div>
-        </div>
-
-        <div className="mt-8 text-center text-sm text-gray-500">
-          <p>
-            Need help? Contact{" "}
-            <a 
-              href="mailto:support@vcyberiz.com" 
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              support@vcyberiz.com
-            </a>
-          </p>
-        </div>
-      </div>
-    </main>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
