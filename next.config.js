@@ -19,11 +19,7 @@ const nextConfig = {
     return config;
   },
   experimental: {
-    https: true,
-    httpsOptions: {
-      key: fs.readFileSync('./certificates/localhost-key.pem'),
-      cert: fs.readFileSync('./certificates/localhost.pem'),
-    }
+    // other experimental options here
   }
 };
 
